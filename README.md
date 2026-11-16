@@ -27,7 +27,7 @@ The idea is simple: people shouldn't have to organize their thoughts before ente
 - **Student:** [Fatima Azhar]
 - **Course:** [Mobile APP DEVELOPMENT]
 - **Semester:** [Semester 5]
-- **Instructor:** [Sir Bilal]
+- **Instructor:** [Sir Muhammad Bilal]
 
 ## Status
 In development.
