@@ -1,0 +1,15 @@
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <style name="Base.Theme.Unsaid" parent="Theme.Material3.Dark.NoActionBar">
+        <item name="colorPrimary">@color/unsaid_accent</item>
+        <item name="colorOnPrimary">@color/unsaid_background</item>
+        <item name="android:colorBackground">@color/unsaid_background</item>
+        <item name="colorOnBackground">@color/unsaid_text</item>
+        <item name="colorSurface">@color/unsaid_surface</item>
+        <item name="colorOnSurface">@color/unsaid_text</item>
+        <item name="colorOnSurfaceVariant">@color/unsaid_text_secondary</item>
+        <item name="android:statusBarColor">@color/unsaid_background</item>
+        <item name="android:navigationBarColor">@color/unsaid_background</item>
+    </style>
+
+    <style name="Theme.Unsaid" parent="Base.Theme.Unsaid" />
+</resources>

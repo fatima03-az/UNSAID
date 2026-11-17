@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="unsaid_background">#171417</color>
+    <color name="unsaid_surface">#242025</color>
+    <color name="unsaid_accent">#C08497</color>
+    <color name="unsaid_text">#F5EDF0</color>
+    <color name="unsaid_text_secondary">#A99BA2</color>
+
+    <color name="priority_high">#D9827E</color>
+    <color name="priority_medium">#D8B98A</color>
+    <color name="priority_low">#9DB59A</color>
+</resources>
