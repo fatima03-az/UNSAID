@@ -37,11 +37,22 @@
     </ScrollView>
 
     <com.google.android.material.button.MaterialButton
-        android:id="@+id/btnBack"
+        android:id="@+id/btnSave"
         android:layout_width="match_parent"
         android:layout_height="56dp"
         android:layout_marginTop="16dp"
+        android:text="Save all"
+        android:textSize="16sp"
+        app:cornerRadius="28dp" />
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/btnBack"
+        style="@style/Widget.Material3.Button.OutlinedButton"
+        android:layout_width="match_parent"
+        android:layout_height="56dp"
+        android:layout_marginTop="10dp"
         android:text="Back"
         android:textSize="16sp"
         app:cornerRadius="28dp" />
+
 </LinearLayout>

@@ -1,11 +1,19 @@
 package com.fatima.unsaid;
 
+import androidx.room.Entity;
+import androidx.room.PrimaryKey;
+
+@Entity
 public class Task {
+    @PrimaryKey(autoGenerate = true)
+    public int id;
+
     public String title;
     public String type;      // Task, Event or Note
     public String category;
     public String priority;  // High, Medium or Low
     public String deadline;  // can be empty
+    public boolean done;
 
     public Task(String title, String type, String category, String priority, String deadline) {
         this.title = title;
