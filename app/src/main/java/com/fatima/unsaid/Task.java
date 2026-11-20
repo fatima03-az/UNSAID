@@ -14,7 +14,7 @@ public class Task {
     public String priority;  // High, Medium or Low
     public String deadline;  // can be empty
     public boolean done;
-
+    public long dueMillis;   // exact due date, 0 if none
     public Task(String title, String type, String category, String priority, String deadline) {
         this.title = title;
         this.type = type;
