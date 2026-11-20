@@ -82,15 +82,21 @@ public class ReviewActivity extends AppCompatActivity {
         btnDate.setOnClickListener(v -> {
             Calendar cal = Calendar.getInstance();
             if (due[0] > 0) cal.setTimeInMillis(due[0]);
-            new DatePickerDialog(this, (picker, year, month, day) -> {
+            DatePickerDialog picker = new DatePickerDialog(this, (p, year, month, day) -> {
                 Calendar chosen = Calendar.getInstance();
                 chosen.set(year, month, day, 9, 0, 0);
+                // If 9:00 has already passed today, remind in one minute
+                if (chosen.getTimeInMillis() < System.currentTimeMillis()) {
+                    chosen.setTimeInMillis(System.currentTimeMillis() + 60000);
+                }
                 due[0] = chosen.getTimeInMillis();
                 deadline[0] = new SimpleDateFormat("EEE, d MMM", Locale.getDefault())
                         .format(chosen.getTime());
                 btnDate.setText(deadline[0]);
             }, cal.get(Calendar.YEAR), cal.get(Calendar.MONTH),
-                    cal.get(Calendar.DAY_OF_MONTH)).show();
+                    cal.get(Calendar.DAY_OF_MONTH));
+            picker.getDatePicker().setMinDate(System.currentTimeMillis() - 1000);
+            picker.show();
         });
 
         new MaterialAlertDialogBuilder(this)
@@ -118,7 +124,13 @@ public class ReviewActivity extends AppCompatActivity {
             Toast.makeText(this, "Nothing to save", Toast.LENGTH_SHORT).show();
             return;
         }
-        AppDatabase.getInstance(this).taskDao().insertAll(tasks);
+        TaskDao dao = AppDatabase.getInstance(this).taskDao();
+        List<Long> ids = dao.insertAll(tasks);
+        for (int i = 0; i < tasks.size(); i++) {
+            Task t = tasks.get(i);
+            t.id = ids.get(i).intValue();
+            ReminderHelper.schedule(this, t);
+        }
         Toast.makeText(this, tasks.size() + " items saved", Toast.LENGTH_SHORT).show();
         startActivity(new Intent(this, TasksActivity.class));
         finish();

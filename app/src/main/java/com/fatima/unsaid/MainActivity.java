@@ -1,6 +1,8 @@
 package com.fatima.unsaid;
 
 import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.os.Build;
 import android.os.Bundle;
 import android.widget.EditText;
 import android.widget.TextView;
@@ -24,6 +26,15 @@ public class MainActivity extends AppCompatActivity {
         btnOrganize = findViewById(R.id.btnOrganize);
         tvSummary = findViewById(R.id.tvSummary);
 
+        // Android 13 and newer must ask permission to show notifications
+        if (Build.VERSION.SDK_INT >= 33) {
+            if (checkSelfPermission(android.Manifest.permission.POST_NOTIFICATIONS)
+                    != PackageManager.PERMISSION_GRANTED) {
+                requestPermissions(
+                        new String[]{android.Manifest.permission.POST_NOTIFICATIONS}, 1);
+            }
+        }
+
         btnOrganize.setOnClickListener(v -> {
             String thought = etThought.getText().toString().trim();
             if (thought.isEmpty()) {
@@ -33,6 +44,14 @@ public class MainActivity extends AppCompatActivity {
                 intent.putExtra("thought", thought);
                 startActivity(intent);
             }
+        });
+        // TEMPORARY test: long-press the "Good evening" greeting
+        findViewById(R.id.tvGreeting).setOnLongClickListener(v -> {
+            Intent test = new Intent(this, ReminderReceiver.class);
+            test.putExtra("title", "Test reminder");
+            test.putExtra("id", 999);
+            sendBroadcast(test);
+            return true;
         });
 
         tvSummary.setOnClickListener(v ->

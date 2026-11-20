@@ -103,10 +103,14 @@ public class TasksActivity extends AppCompatActivity {
             cbDone.setOnCheckedChangeListener((button, checked) -> {
                 t.done = checked;
                 dao.update(t);
+                if (checked) ReminderHelper.cancel(this, t);
+                else ReminderHelper.schedule(this, t);
+
                 applyDoneStyle(tvTitle, checked);
             });
 
             tvDelete.setOnClickListener(v -> {
+                ReminderHelper.cancel(this, t);
                 dao.delete(t);
                 loadTasks();
             });

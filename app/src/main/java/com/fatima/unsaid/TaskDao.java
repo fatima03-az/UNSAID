@@ -10,7 +10,7 @@ import java.util.List;
 @Dao
 public interface TaskDao {
     @Insert
-    void insertAll(List<Task> tasks);
+    List<Long> insertAll(List<Task> tasks);
 
     @Query("SELECT * FROM Task ORDER BY id DESC")
     List<Task> getAll();
