@@ -42,10 +42,8 @@ public class ReviewActivity extends AppCompatActivity {
         }
         AppDatabase.getInstance(this).taskDao().insertAll(tasks);
         Toast.makeText(this, tasks.size() + " items saved", Toast.LENGTH_SHORT).show();
-
-        Intent home = new Intent(this, MainActivity.class);
-        home.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-        startActivity(home);
+        startActivity(new Intent(this, TasksActivity.class));
         finish();
+
     }
 }
