@@ -4,6 +4,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Locale;
 
 public class SimpleParser {
 
@@ -54,7 +57,14 @@ public class SimpleParser {
             }
 
             String title = cleanTitle(text);
-            result.add(new Task(title, type, category(original), priority(original, deadline), deadline));
+            Task task = new Task(title, type, category(original), priority(original, deadline), deadline);
+            Calendar due = toDate(deadline);
+            if (due != null) {
+                task.dueMillis = due.getTimeInMillis();
+                task.deadline = new SimpleDateFormat("EEE, d MMM", Locale.getDefault())
+                        .format(due.getTime());
+            }
+            result.add(task);
         }
         return result;
     }
@@ -101,5 +111,56 @@ public class SimpleParser {
             sb.append(capitalize(word.toLowerCase()));
         }
         return sb.toString();
+    }
+    private static Calendar toDate(String word) {
+        if (word.isEmpty()) return null;
+        String w = word.toLowerCase(Locale.ROOT);
+
+        Calendar c = Calendar.getInstance();
+        c.set(Calendar.HOUR_OF_DAY, 9);
+        c.set(Calendar.MINUTE, 0);
+        c.set(Calendar.SECOND, 0);
+        c.set(Calendar.MILLISECOND, 0);
+
+        if (w.equals("today") || w.equals("this morning") || w.equals("this afternoon")) {
+            // stays today
+        } else if (w.equals("tonight") || w.equals("this evening")) {
+            c.set(Calendar.HOUR_OF_DAY, 19);
+        } else if (w.equals("tomorrow")) {
+            c.add(Calendar.DAY_OF_YEAR, 1);
+        } else if (w.equals("day after tomorrow")) {
+            c.add(Calendar.DAY_OF_YEAR, 2);
+        } else if (w.equals("next week")) {
+            c.add(Calendar.DAY_OF_YEAR, 7);
+        } else if (w.equals("this weekend")) {
+            c.add(Calendar.DAY_OF_YEAR, daysUntil(c, Calendar.SATURDAY, false));
+        } else {
+            boolean next = w.startsWith("next ");
+            String day = next ? w.substring(5) : w;
+            int target = dayNumber(day);
+            if (target < 0) return null;
+            c.add(Calendar.DAY_OF_YEAR, daysUntil(c, target, next));
+        }
+        return c;
+    }
+
+    private static int daysUntil(Calendar c, int target, boolean strictlyAfter) {
+        int today = c.get(Calendar.DAY_OF_WEEK);
+        int d = (target - today + 7) % 7;
+        if (strictlyAfter && d == 0) d = 7;
+        return d;
+    }
+
+    private static int dayNumber(String day) {
+        switch (day) {
+            case "monday": return Calendar.MONDAY;
+            case "tuesday": return Calendar.TUESDAY;
+            case "wednesday": return Calendar.WEDNESDAY;
+            case "thursday": return Calendar.THURSDAY;
+            case "friday": return Calendar.FRIDAY;
+            case "saturday": return Calendar.SATURDAY;
+            case "sunday": return Calendar.SUNDAY;
+        }
+        return -1;
     }
 }
