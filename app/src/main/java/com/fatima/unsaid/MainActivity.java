@@ -1,17 +1,22 @@
 package com.fatima.unsaid;
 
 import android.app.AlarmManager;
-import android.net.Uri;
-import android.provider.Settings;
+import android.content.ActivityNotFoundException;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.provider.Settings;
+import android.speech.RecognizerIntent;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.app.AppCompatActivity;
 import com.google.android.material.button.MaterialButton;
+import java.util.ArrayList;
 import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
@@ -19,6 +24,7 @@ public class MainActivity extends AppCompatActivity {
     EditText etThought;
     MaterialButton btnOrganize;
     TextView tvSummary;
+    ActivityResultLauncher<Intent> voiceLauncher;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -38,8 +44,7 @@ public class MainActivity extends AppCompatActivity {
             }
         }
 
-
-
+        // Exact alarms permission (so reminders arrive on time)
         if (Build.VERSION.SDK_INT >= 31) {
             AlarmManager am = (AlarmManager) getSystemService(ALARM_SERVICE);
             if (!am.canScheduleExactAlarms()) {
@@ -47,6 +52,35 @@ public class MainActivity extends AppCompatActivity {
                         Uri.parse("package:" + getPackageName())));
             }
         }
+
+        // Voice input: receives the spoken text and adds it to the box
+        voiceLauncher = registerForActivityResult(
+                new ActivityResultContracts.StartActivityForResult(), result -> {
+                    if (result.getResultCode() == RESULT_OK && result.getData() != null) {
+                        ArrayList<String> spoken = result.getData()
+                                .getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS);
+                        if (spoken != null && !spoken.isEmpty()) {
+                            String old = etThought.getText().toString().trim();
+                            String text = spoken.get(0);
+                            etThought.setText(old.isEmpty() ? text : old + ". " + text);
+                            etThought.setSelection(etThought.getText().length());
+                        }
+                    }
+                });
+
+        findViewById(R.id.btnMic).setOnClickListener(v -> {
+            Intent intent = new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
+            intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL,
+                    RecognizerIntent.LANGUAGE_MODEL_FREE_FORM);
+            intent.putExtra(RecognizerIntent.EXTRA_PROMPT, "Say what's on your mind");
+            try {
+                voiceLauncher.launch(intent);
+            } catch (ActivityNotFoundException e) {
+                Toast.makeText(this, "Voice input isn't available on this device",
+                        Toast.LENGTH_LONG).show();
+            }
+        });
+
         btnOrganize.setOnClickListener(v -> {
             String thought = etThought.getText().toString().trim();
             if (thought.isEmpty()) {
