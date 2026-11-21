@@ -45,7 +45,7 @@ public class TasksActivity extends AppCompatActivity {
             }
         });
 
-        findViewById(R.id.btnBack).setOnClickListener(v -> finish());
+        NavBar.setup(this, 1);
         buildChips();
     }
 

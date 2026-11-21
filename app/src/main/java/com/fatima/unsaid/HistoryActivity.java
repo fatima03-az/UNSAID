@@ -44,7 +44,7 @@ public class HistoryActivity extends AppCompatActivity {
             }
         });
 
-        findViewById(R.id.btnBack).setOnClickListener(v -> finish());
+        NavBar.setup(this, 2);
     }
 
     @Override

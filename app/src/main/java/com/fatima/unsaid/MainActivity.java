@@ -34,6 +34,7 @@ public class MainActivity extends AppCompatActivity {
         etThought = findViewById(R.id.etThought);
         btnOrganize = findViewById(R.id.btnOrganize);
         tvSummary = findViewById(R.id.tvSummary);
+        NavBar.setup(this, 0);
 
         // Android 13 and newer must ask permission to show notifications
         if (Build.VERSION.SDK_INT >= 33) {

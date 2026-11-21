@@ -1,14 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/unsaid_background">
+    android:background="@color/unsaid_background"
+    android:fitsSystemWindows="true"
+    android:orientation="vertical">
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
         android:orientation="vertical"
         android:padding="24dp">
 
@@ -32,12 +35,11 @@
         <com.google.android.material.card.MaterialCardView
             android:layout_width="match_parent"
             android:layout_height="0dp"
-            android:layout_marginTop="28dp"
+            android:layout_marginTop="24dp"
             android:layout_weight="1"
             app:cardBackgroundColor="@color/unsaid_surface"
             app:cardCornerRadius="28dp"
-            app:cardElevation="0dp"
-            xmlns:app="http://schemas.android.com/apk/res-auto">
+            app:cardElevation="0dp">
 
             <EditText
                 android:id="@+id/etThought"
@@ -77,27 +79,30 @@
                 android:layout_weight="1"
                 android:text="Organize"
                 android:textSize="16sp"
-                app:cornerRadius="28dp"
-                xmlns:app="http://schemas.android.com/apk/res-auto" />
+                app:cornerRadius="28dp" />
         </LinearLayout>
 
         <TextView
             android:id="@+id/tvSummary"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
+            android:layout_marginTop="12dp"
             android:gravity="center"
+            android:padding="8dp"
             android:text="No tasks yet"
             android:textColor="@color/unsaid_text_secondary"
             android:textSize="14sp" />
+
         <TextView
             android:id="@+id/tvHistory"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:gravity="center"
-            android:padding="12dp"
+            android:padding="8dp"
             android:text="View history"
             android:textColor="@color/unsaid_accent"
             android:textSize="14sp" />
     </LinearLayout>
-</FrameLayout>
+
+    <include layout="@layout/view_nav" />
+</LinearLayout>
