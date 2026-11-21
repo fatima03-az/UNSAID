@@ -156,6 +156,7 @@ public class ReviewActivity extends AppCompatActivity {
                     .setMessage(msg)
                     .setCancelable(false)
                     .setPositiveButton("OK", (d, w) -> {
+                        setResult(RESULT_OK);
                         startActivity(new Intent(this, TasksActivity.class));
                         finish();
                     })

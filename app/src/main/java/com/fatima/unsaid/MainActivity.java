@@ -1,39 +1,36 @@
 package com.fatima.unsaid;
 
 import android.app.AlarmManager;
-import android.content.ActivityNotFoundException;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.provider.Settings;
-import android.speech.RecognizerIntent;
-import android.widget.EditText;
+import android.view.View;
+import android.widget.LinearLayout;
 import android.widget.TextView;
-import android.widget.Toast;
-import androidx.activity.result.ActivityResultLauncher;
-import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.app.AppCompatActivity;
-import com.google.android.material.button.MaterialButton;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
 
-    EditText etThought;
-    MaterialButton btnOrganize;
-    TextView tvSummary;
-    ActivityResultLauncher<Intent> voiceLauncher;
+    TextView tvGreeting, tvCardTitle, tvCardSub, tvUpcomingEmpty;
+    LinearLayout upcomingList;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        etThought = findViewById(R.id.etThought);
-        btnOrganize = findViewById(R.id.btnOrganize);
-        tvSummary = findViewById(R.id.tvSummary);
+        tvGreeting = findViewById(R.id.tvGreeting);
+        tvCardTitle = findViewById(R.id.tvCardTitle);
+        tvCardSub = findViewById(R.id.tvCardSub);
+        tvUpcomingEmpty = findViewById(R.id.tvUpcomingEmpty);
+        upcomingList = findViewById(R.id.upcomingList);
+
         NavBar.setup(this, 0);
 
         // Android 13 and newer must ask permission to show notifications
@@ -54,63 +51,76 @@ public class MainActivity extends AppCompatActivity {
             }
         }
 
-        // Voice input: receives the spoken text and adds it to the box
-        voiceLauncher = registerForActivityResult(
-                new ActivityResultContracts.StartActivityForResult(), result -> {
-                    if (result.getResultCode() == RESULT_OK && result.getData() != null) {
-                        ArrayList<String> spoken = result.getData()
-                                .getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS);
-                        if (spoken != null && !spoken.isEmpty()) {
-                            String old = etThought.getText().toString().trim();
-                            String text = spoken.get(0);
-                            etThought.setText(old.isEmpty() ? text : old + ". " + text);
-                            etThought.setSelection(etThought.getText().length());
-                        }
-                    }
-                });
+        findViewById(R.id.cardTasks).setOnClickListener(v -> openTasks());
+        findViewById(R.id.tvSeeAll).setOnClickListener(v -> openTasks());
 
-        findViewById(R.id.btnMic).setOnClickListener(v -> {
-            Intent intent = new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
-            intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL,
-                    RecognizerIntent.LANGUAGE_MODEL_FREE_FORM);
-            intent.putExtra(RecognizerIntent.EXTRA_PROMPT, "Say what's on your mind");
-            try {
-                voiceLauncher.launch(intent);
-            } catch (ActivityNotFoundException e) {
-                Toast.makeText(this, "Voice input isn't available on this device",
-                        Toast.LENGTH_LONG).show();
-            }
+        findViewById(R.id.tileCapture).setOnClickListener(v ->
+                startActivity(new Intent(this, CaptureActivity.class)));
+
+        findViewById(R.id.tileVoice).setOnClickListener(v -> {
+            Intent intent = new Intent(this, CaptureActivity.class);
+            intent.putExtra("voice", true);
+            startActivity(intent);
         });
+    }
 
-        btnOrganize.setOnClickListener(v -> {
-            String thought = etThought.getText().toString().trim();
-            if (thought.isEmpty()) {
-                Toast.makeText(this, "Write something first", Toast.LENGTH_SHORT).show();
-            } else {
-                Intent intent = new Intent(this, ReviewActivity.class);
-                intent.putExtra("thought", thought);
-                startActivity(intent);
-            }
-        });
-        findViewById(R.id.tvHistory).setOnClickListener(v ->
-                startActivity(new Intent(this, HistoryActivity.class)));
-
-        tvSummary.setOnClickListener(v ->
-                startActivity(new Intent(this, TasksActivity.class)));
+    private void openTasks() {
+        startActivity(new Intent(this, TasksActivity.class));
     }
 
     @Override
     protected void onResume() {
         super.onResume();
+
+        // Greeting changes with the time of day
+        int hour = Calendar.getInstance().get(Calendar.HOUR_OF_DAY);
+        if (hour < 12) tvGreeting.setText("Good morning");
+        else if (hour < 18) tvGreeting.setText("Good afternoon");
+        else tvGreeting.setText("Good evening");
+
+        // Start and end of today
+        Calendar cal = Calendar.getInstance();
+        cal.set(Calendar.HOUR_OF_DAY, 0);
+        cal.set(Calendar.MINUTE, 0);
+        cal.set(Calendar.SECOND, 0);
+        cal.set(Calendar.MILLISECOND, 0);
+        long startOfDay = cal.getTimeInMillis();
+        long endOfDay = startOfDay + 24L * 60 * 60 * 1000;
+
         List<Task> all = AppDatabase.getInstance(this).taskDao().getAll();
-        int pending = 0;
+        List<Task> pending = new ArrayList<>();
+        int dueToday = 0;
         for (Task t : all) {
-            if (!t.done) pending++;
+            if (t.done) continue;
+            pending.add(t);
+            if (t.dueMillis >= startOfDay && t.dueMillis < endOfDay) dueToday++;
         }
-        if (pending == 0) {
-            tvSummary.setText("No pending tasks · tap to open My Tasks");
+
+        if (pending.isEmpty()) {
+            tvCardTitle.setText("Nothing pending");
+            tvCardSub.setText("Tap to open My Tasks");
         } else {
-            tvSummary.setText(pending + " pending · tap to open My Tasks");
+            tvCardTitle.setText("You have " + pending.size()
+                    + (pending.size() == 1 ? " pending task" : " pending tasks"));
+            tvCardSub.setText(dueToday + " due today · tap to open");
         }
+
+        // Next three tasks: earliest dates first, tasks without a date last
+        pending.sort((a, b) -> Long.compare(
+                a.dueMillis == 0 ? Long.MAX_VALUE : a.dueMillis,
+                b.dueMillis == 0 ? Long.MAX_VALUE : b.dueMillis));
+
+        upcomingList.removeAllViews();
+        int shown = 0;
+        for (Task t : pending) {
+            if (shown == 3) break;
+            View card = getLayoutInflater().inflate(R.layout.item_task, upcomingList, false);
+            ((TextView) card.findViewById(R.id.tvTitle)).setText(t.title);
+            ((TextView) card.findViewById(R.id.tvInfo)).setText(t.getSummary());
+            card.setOnClickListener(v -> openTasks());
+            upcomingList.addView(card);
+            shown++;
+        }
+        tvUpcomingEmpty.setVisibility(shown == 0 ? View.VISIBLE : View.GONE);
     }
 }
