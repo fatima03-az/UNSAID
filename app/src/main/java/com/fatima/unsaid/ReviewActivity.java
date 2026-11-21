@@ -22,6 +22,7 @@ import java.util.Locale;
 public class ReviewActivity extends AppCompatActivity {
 
     List<Task> tasks;
+    String thought;
     LinearLayout taskList;
     String[] categories = {"Academic", "Personal", "Communication", "Work", "Health"};
     String[] priorities = {"High", "Medium", "Low"};
@@ -32,7 +33,7 @@ public class ReviewActivity extends AppCompatActivity {
         setContentView(R.layout.activity_review);
 
         taskList = findViewById(R.id.taskList);
-        String thought = getIntent().getStringExtra("thought");
+        thought = getIntent().getStringExtra("thought");
         tasks = SimpleParser.parse(thought);
 
         render();
@@ -128,6 +129,8 @@ public class ReviewActivity extends AppCompatActivity {
             }
             TaskDao dao = AppDatabase.getInstance(this).taskDao();
             List<Long> ids = dao.insertAll(tasks);
+            AppDatabase.getInstance(this).thoughtDao().insert(
+                    new Thought(thought, System.currentTimeMillis(), tasks.size()));
 
             int reminders = 0;
             String lastTime = "";

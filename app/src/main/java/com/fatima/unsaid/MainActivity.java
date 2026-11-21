@@ -91,6 +91,8 @@ public class MainActivity extends AppCompatActivity {
                 startActivity(intent);
             }
         });
+        findViewById(R.id.tvHistory).setOnClickListener(v ->
+                startActivity(new Intent(this, HistoryActivity.class)));
 
         tvSummary.setOnClickListener(v ->
                 startActivity(new Intent(this, TasksActivity.class)));

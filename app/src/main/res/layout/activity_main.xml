@@ -90,5 +90,14 @@
             android:text="No tasks yet"
             android:textColor="@color/unsaid_text_secondary"
             android:textSize="14sp" />
+        <TextView
+            android:id="@+id/tvHistory"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:padding="12dp"
+            android:text="View history"
+            android:textColor="@color/unsaid_accent"
+            android:textSize="14sp" />
     </LinearLayout>
 </FrameLayout>
