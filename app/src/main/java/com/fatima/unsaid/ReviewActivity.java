@@ -15,6 +15,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
@@ -120,19 +121,48 @@ public class ReviewActivity extends AppCompatActivity {
     }
 
     private void saveAll() {
-        if (tasks.isEmpty()) {
-            Toast.makeText(this, "Nothing to save", Toast.LENGTH_SHORT).show();
-            return;
+        try {
+            if (tasks.isEmpty()) {
+                Toast.makeText(this, "Nothing to save", Toast.LENGTH_SHORT).show();
+                return;
+            }
+            TaskDao dao = AppDatabase.getInstance(this).taskDao();
+            List<Long> ids = dao.insertAll(tasks);
+
+            int reminders = 0;
+            String lastTime = "";
+            for (int i = 0; i < tasks.size(); i++) {
+                Task t = tasks.get(i);
+                t.id = ids.get(i).intValue();
+                if (ReminderHelper.schedule(this, t)) {
+                    reminders++;
+                    lastTime = new SimpleDateFormat("EEE d MMM, HH:mm", Locale.getDefault())
+                            .format(new Date(t.dueMillis));
+                }
+            }
+
+            String msg = tasks.size() + " items saved.\n";
+            if (reminders > 0) {
+                msg += reminders + " reminder(s) set. Last one: " + lastTime;
+            } else {
+                msg += "No reminders were set (no future date on any item).";
+            }
+
+            new MaterialAlertDialogBuilder(this)
+                    .setTitle("Saved")
+                    .setMessage(msg)
+                    .setCancelable(false)
+                    .setPositiveButton("OK", (d, w) -> {
+                        startActivity(new Intent(this, TasksActivity.class));
+                        finish();
+                    })
+                    .show();
+        } catch (Throwable e) {
+            new MaterialAlertDialogBuilder(this)
+                    .setTitle("Error found")
+                    .setMessage(String.valueOf(e))
+                    .setPositiveButton("OK", null)
+                    .show();
         }
-        TaskDao dao = AppDatabase.getInstance(this).taskDao();
-        List<Long> ids = dao.insertAll(tasks);
-        for (int i = 0; i < tasks.size(); i++) {
-            Task t = tasks.get(i);
-            t.id = ids.get(i).intValue();
-            ReminderHelper.schedule(this, t);
-        }
-        Toast.makeText(this, tasks.size() + " items saved", Toast.LENGTH_SHORT).show();
-        startActivity(new Intent(this, TasksActivity.class));
-        finish();
     }
 }
