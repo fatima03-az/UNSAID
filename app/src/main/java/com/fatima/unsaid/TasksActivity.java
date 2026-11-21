@@ -1,5 +1,8 @@
 package com.fatima.unsaid;
 
+import android.text.Editable;
+import android.text.TextWatcher;
+import android.widget.EditText;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.drawable.GradientDrawable;
@@ -17,6 +20,7 @@ public class TasksActivity extends AppCompatActivity {
     LinearLayout chipRow, taskList;
     TextView tvEmpty;
     String selected = "All";
+    String query = "";
     String[] categories = {"All", "Academic", "Personal", "Communication", "Work", "Health"};
 
     @Override
@@ -27,6 +31,19 @@ public class TasksActivity extends AppCompatActivity {
         chipRow = findViewById(R.id.chipRow);
         taskList = findViewById(R.id.taskList);
         tvEmpty = findViewById(R.id.tvEmpty);
+        EditText etSearch = findViewById(R.id.etSearch);
+        GradientDrawable box = new GradientDrawable();
+        box.setCornerRadius(dp(24));
+        box.setColor(ContextCompat.getColor(this, R.color.unsaid_surface));
+        etSearch.setBackground(box);
+        etSearch.addTextChangedListener(new TextWatcher() {
+            public void beforeTextChanged(CharSequence s, int a, int b, int c) {}
+            public void onTextChanged(CharSequence s, int a, int b, int c) {}
+            public void afterTextChanged(Editable s) {
+                query = s.toString().trim().toLowerCase();
+                loadTasks();
+            }
+        });
 
         findViewById(R.id.btnBack).setOnClickListener(v -> finish());
         buildChips();
@@ -85,6 +102,9 @@ public class TasksActivity extends AppCompatActivity {
 
         for (Task t : all) {
             if (!selected.equals("All") && !t.category.equals(selected)) continue;
+            if (!query.isEmpty()
+                    && !t.title.toLowerCase().contains(query)
+                    && !t.category.toLowerCase().contains(query)) continue;
             count++;
 
             View card = getLayoutInflater().inflate(R.layout.item_my_task, taskList, false);
