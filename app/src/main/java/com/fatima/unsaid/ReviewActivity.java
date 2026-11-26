@@ -56,7 +56,7 @@ public class ReviewActivity extends AppCompatActivity {
         }, 55000);
 
         new Thread(() -> {
-            List<Task> ai = GeminiClient.organize(thought);
+            List<Task> ai = Prefs.cloudAiOn(this) ? GeminiClient.organize(thought) : null;
             runOnUiThread(() -> {
                 if (isFinishing() || isDestroyed()) return;
                 if (!finished.compareAndSet(false, true)) return;
@@ -65,7 +65,9 @@ public class ReviewActivity extends AppCompatActivity {
                     tvStatus.setText("Organized by AI · tap an item to edit it");
                 } else {
                     tasks = SimpleParser.parse(thought);
-                    tvStatus.setText("Organized offline (" + GeminiClient.lastError + ")");
+                    tvStatus.setText(Prefs.cloudAiOn(this)
+                            ? "Organized offline (" + GeminiClient.lastError + ")"
+                            : "Organized offline (Cloud AI is off in Settings)");
                 }
                 render();
             });

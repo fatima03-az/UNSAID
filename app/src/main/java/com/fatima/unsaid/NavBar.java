@@ -8,15 +8,17 @@ import androidx.core.content.ContextCompat;
 
 public class NavBar {
 
-    // active: 0 = Home, 1 = Tasks, 2 = History
+    // active: 0 = Home, 1 = Tasks, 2 = History, 3 = Settings
     public static void setup(Activity activity, int active) {
         TextView[] tabs = {
                 activity.findViewById(R.id.navHome),
                 activity.findViewById(R.id.navTasks),
-                activity.findViewById(R.id.navHistory)
+                activity.findViewById(R.id.navHistory),
+                activity.findViewById(R.id.navSettings)
         };
         Class<?>[] targets = {
-                MainActivity.class, TasksActivity.class, HistoryActivity.class
+                MainActivity.class, TasksActivity.class,
+                HistoryActivity.class, SettingsActivity.class
         };
 
         int accent = ContextCompat.getColor(activity, R.color.unsaid_accent);

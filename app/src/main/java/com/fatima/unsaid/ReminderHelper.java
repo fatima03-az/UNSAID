@@ -9,6 +9,7 @@ import android.os.Build;
 public class ReminderHelper {
 
     public static boolean schedule(Context context, Task task) {
+        if (!Prefs.remindersOn(context)) return false;
         if (task.done || task.dueMillis <= System.currentTimeMillis()) return false;
 
         AlarmManager am = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
