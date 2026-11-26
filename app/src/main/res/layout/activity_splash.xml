@@ -24,14 +24,14 @@
         android:text="UNSAID"
         android:textColor="@color/unsaid_accent"
         android:textSize="36sp" />
-
     <TextView
         android:id="@+id/tvTagline"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="16dp"
+        android:fontFamily="cursive"
         android:gravity="center"
         android:text="Think freely.\nWe'll organize the rest."
         android:textColor="@color/unsaid_text"
-        android:textSize="16sp" />
+        android:textSize="18sp" />
 </LinearLayout>

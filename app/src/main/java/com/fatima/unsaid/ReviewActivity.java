@@ -14,6 +14,7 @@ import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
@@ -21,9 +22,10 @@ import java.util.Locale;
 
 public class ReviewActivity extends AppCompatActivity {
 
-    List<Task> tasks;
+    List<Task> tasks = new ArrayList<>();
     String thought;
     LinearLayout taskList;
+    TextView tvStatus;
     String[] categories = {"Academic", "Personal", "Communication", "Work", "Health"};
     String[] priorities = {"High", "Medium", "Low"};
 
@@ -33,13 +35,41 @@ public class ReviewActivity extends AppCompatActivity {
         setContentView(R.layout.activity_review);
 
         taskList = findViewById(R.id.taskList);
+        tvStatus = findViewById(R.id.tvStatus);
         thought = getIntent().getStringExtra("thought");
-        tasks = SimpleParser.parse(thought);
-
-        render();
 
         findViewById(R.id.btnSave).setOnClickListener(v -> saveAll());
         findViewById(R.id.btnBack).setOnClickListener(v -> finish());
+
+        // Try the cloud AI first. If it fails or takes too long, use the offline parser.
+        tvStatus.setText("Organizing your thoughts…");
+        final java.util.concurrent.atomic.AtomicBoolean finished =
+                new java.util.concurrent.atomic.AtomicBoolean(false);
+
+        // Safety timer: after 15 seconds, stop waiting
+        new android.os.Handler(android.os.Looper.getMainLooper()).postDelayed(() -> {
+            if (finished.compareAndSet(false, true) && !isFinishing()) {
+                tasks = SimpleParser.parse(thought);
+                tvStatus.setText("Organized offline (AI took too long: " + GeminiClient.lastError + ")");
+                render();
+            }
+        }, 55000);
+
+        new Thread(() -> {
+            List<Task> ai = GeminiClient.organize(thought);
+            runOnUiThread(() -> {
+                if (isFinishing() || isDestroyed()) return;
+                if (!finished.compareAndSet(false, true)) return;
+                if (ai != null) {
+                    tasks = ai;
+                    tvStatus.setText("Organized by AI · tap an item to edit it");
+                } else {
+                    tasks = SimpleParser.parse(thought);
+                    tvStatus.setText("Organized offline (" + GeminiClient.lastError + ")");
+                }
+                render();
+            });
+        }).start();
     }
 
     private void render() {
