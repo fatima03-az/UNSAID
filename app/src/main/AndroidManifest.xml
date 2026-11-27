@@ -17,7 +17,7 @@
         android:theme="@style/Theme.Unsaid">
         <activity
             android:name=".MainActivity"
-            android:exported="false"></activity>
+            android:exported="false" />
         <activity
             android:name=".ReviewActivity"
             android:exported="false"
@@ -52,7 +52,15 @@
             android:name=".SettingsActivity"
             android:exported="false"
             android:windowSoftInputMode="adjustResize" />
-        <receiver android:name=".DailySummaryReceiver" android:exported="false" />
+
+        <receiver
+            android:name=".DailySummaryReceiver"
+            android:exported="false" />
+
+        <activity
+            android:name=".InsightsActivity"
+            android:exported="false"
+            android:windowSoftInputMode="adjustResize" />
     </application>
 
 </manifest>

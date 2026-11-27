@@ -14,7 +14,7 @@ public class SettingsActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_settings);
 
-        NavBar.setup(this, 3);
+        NavBar.setup(this, 4);
 
         MaterialSwitch swReminders = findViewById(R.id.swReminders);
         MaterialSwitch swCloudAi = findViewById(R.id.swCloudAi);

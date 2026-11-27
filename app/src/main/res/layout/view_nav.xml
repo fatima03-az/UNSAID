@@ -31,6 +31,15 @@
         android:gravity="center"
         android:text="History"
         android:textSize="14sp" />
+
+    <TextView
+        android:id="@+id/navInsights"
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_weight="1"
+        android:gravity="center"
+        android:text="Insights"
+        android:textSize="14sp" />
     <TextView
         android:id="@+id/navSettings"
         android:layout_width="0dp"
