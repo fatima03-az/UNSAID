@@ -32,6 +32,7 @@ public class MainActivity extends AppCompatActivity {
         upcomingList = findViewById(R.id.upcomingList);
 
         NavBar.setup(this, 0);
+        if (Prefs.dailySummaryOn(this)) DailySummary.schedule(this);
 
         // Android 13 and newer must ask permission to show notifications
         if (Build.VERSION.SDK_INT >= 33) {

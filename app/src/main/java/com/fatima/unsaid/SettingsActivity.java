@@ -26,7 +26,11 @@ public class SettingsActivity extends AppCompatActivity {
 
         swReminders.setOnCheckedChangeListener((b, on) -> Prefs.setRemindersOn(this, on));
         swCloudAi.setOnCheckedChangeListener((b, on) -> Prefs.setCloudAiOn(this, on));
-        swSummary.setOnCheckedChangeListener((b, on) -> Prefs.setDailySummaryOn(this, on));
+        swSummary.setOnCheckedChangeListener((b, on) -> {
+            Prefs.setDailySummaryOn(this, on);
+            if (on) DailySummary.schedule(this);
+            else DailySummary.cancel(this);
+        });
 
         findViewById(R.id.btnClear).setOnClickListener(v ->
                 new MaterialAlertDialogBuilder(this)
