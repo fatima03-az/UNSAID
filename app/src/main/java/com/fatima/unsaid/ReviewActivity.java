@@ -50,7 +50,7 @@ public class ReviewActivity extends AppCompatActivity {
         new android.os.Handler(android.os.Looper.getMainLooper()).postDelayed(() -> {
             if (finished.compareAndSet(false, true) && !isFinishing()) {
                 tasks = SimpleParser.parse(thought);
-                tvStatus.setText("Organized offline (AI took too long: " + GeminiClient.lastError + ")");
+                tvStatus.setText("Organized offline · tap an item to edit it");
                 render();
             }
         }, 55000);
@@ -66,8 +66,8 @@ public class ReviewActivity extends AppCompatActivity {
                 } else {
                     tasks = SimpleParser.parse(thought);
                     tvStatus.setText(Prefs.cloudAiOn(this)
-                            ? "Organized offline (" + GeminiClient.lastError + ")"
-                            : "Organized offline (Cloud AI is off in Settings)");
+                            ? "Organized offline · tap an item to edit it"
+                            : "Organized offline (Cloud AI is off) · tap an item to edit it");
                 }
                 render();
             });
@@ -195,8 +195,8 @@ public class ReviewActivity extends AppCompatActivity {
                     .show();
         } catch (Throwable e) {
             new MaterialAlertDialogBuilder(this)
-                    .setTitle("Error found")
-                    .setMessage(String.valueOf(e))
+                    .setTitle("Couldn't save")
+                    .setMessage("Something went wrong while saving. Please try again.")
                     .setPositiveButton("OK", null)
                     .show();
         }
