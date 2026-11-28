@@ -41,7 +41,9 @@
         android:layout_weight="1"
         app:cardBackgroundColor="@color/unsaid_surface"
         app:cardCornerRadius="28dp"
-        app:cardElevation="0dp">
+        app:cardElevation="0dp"
+        app:strokeColor="#3A2F36"
+        app:strokeWidth="1dp">
 
         <EditText
             android:id="@+id/etThought"
@@ -81,6 +83,10 @@
             android:layout_weight="1"
             android:text="Organize"
             android:textSize="16sp"
-            app:cornerRadius="28dp" />
+            app:cornerRadius="28dp"
+            android:background="@drawable/bg_rose_card"
+            app:backgroundTint="@null"
+            android:textColor="@color/unsaid_background"
+            android:textStyle="bold" />
     </LinearLayout>
 </LinearLayout>

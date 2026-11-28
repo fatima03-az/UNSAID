@@ -45,7 +45,10 @@
                 android:clickable="true"
                 android:focusable="true"
                 android:orientation="vertical"
-                android:padding="24dp">
+                android:padding="24dp"
+                android:elevation="10dp"
+                android:outlineAmbientShadowColor="@color/unsaid_accent"
+                android:outlineSpotShadowColor="@color/unsaid_accent">
 
                 <TextView
                     android:id="@+id/tvCardTitle"
