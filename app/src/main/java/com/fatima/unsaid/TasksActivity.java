@@ -122,6 +122,7 @@ public class TasksActivity extends AppCompatActivity {
             applyDoneStyle(tvTitle, t.done);
             cbDone.setOnCheckedChangeListener((button, checked) -> {
                 t.done = checked;
+                t.completedMillis = checked ? System.currentTimeMillis() : 0;
                 dao.update(t);
                 if (checked) ReminderHelper.cancel(this, t);
                 else ReminderHelper.schedule(this, t);

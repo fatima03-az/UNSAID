@@ -15,6 +15,7 @@ public class Task {
     public String deadline;  // can be empty
     public boolean done;
     public long dueMillis;   // exact due date, 0 if none
+    public long completedMillis;   // when the task was ticked off, 0 if not done
     public Task(String title, String type, String category, String priority, String deadline) {
         this.title = title;
         this.type = type;
